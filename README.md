@@ -1,10 +1,10 @@
-# Salient
+# Axurry
 
 **A sales & trading desk assistant that turns desk risk into a ranked call list — and preps every client call in one click.**
 
 *(Repository name: `Desk-Intel`.)*
 
-Salient opens to a clean landing page with **two boxes**; click one to open that tool full-screen:
+Axurry opens to a clean landing page with **two boxes**; click one to open that tool full-screen:
 
 | 🎯 Axe Matcher | 📇 Pre-Call Brief |
 |---|---|
@@ -24,7 +24,7 @@ A salesperson sits between two sides:
 - **Supply** — the desk's traders hold risk/inventory they need to move (*axes*).
 - **Demand** — institutional clients (pensions, insurers, asset managers, hedge funds) who might want it.
 
-The whole job is matching the two. Today that's mostly memory, gut, and a mass "run" email. Salient
+The whole job is matching the two. Today that's mostly memory, gut, and a mass "run" email. Axurry
 makes the matching explicit: it scores every client against an axe on the same things a good
 salesperson weighs — **mandate fit, existing holdings, trading history with the desk, and recent
 activity** — then ranks them and drafts the pitch.

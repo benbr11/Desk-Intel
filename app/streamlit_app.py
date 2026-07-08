@@ -24,7 +24,7 @@ from engine.match import WEIGHTS, MatchEngine
 # ---------------------------------------------------------------------------
 # Branding -- change APP_NAME here and it updates everywhere.
 # ---------------------------------------------------------------------------
-APP_NAME = "Salient"
+APP_NAME = "Axurry"
 APP_TAGLINE = "Sales & Trading desk assistant"
 
 st.set_page_config(page_title=APP_NAME, layout="wide", page_icon="📈",
