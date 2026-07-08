@@ -274,18 +274,36 @@ def inject_theme(view: str) -> None:
     st.markdown(_CSS % v, unsafe_allow_html=True)
 
 
+def privacy_content() -> None:
+    """Reminder of how to keep this private / move it to a firm's servers."""
+    st.markdown("**Public demo = synthetic data only** — safe to share.")
+    st.markdown("**Password gate:** loading real data (CSV / Database / API) requires the "
+                "access password. This is **not** safe for real client data on a public host.")
+    st.markdown("**For real client / MNPI data — run it on the firm's own server:**")
+    st.markdown("1. Copy the repo to the internal server\n"
+                "2. `pip install -r requirements.txt`\n"
+                "3. `streamlit run app/streamlit_app.py`\n"
+                "4. Point the Database / API source at internal systems")
+    st.caption("Safe = behind the firm's network and login, never a public URL.")
+
+
 def render_topbar(view: str) -> None:
-    cols = st.columns([0.8, 1.2, 2, 8])
-    with cols[0]:
+    if view == "home":
+        c_toggle, c_priv, _rest = st.columns([1, 2, 9])
+    else:
+        c_toggle, c_back, c_rubric, c_priv, _rest = st.columns([0.9, 1.3, 2, 1.7, 6])
+        with c_back:
+            st.button("←  Back", key=f"back_{view}", on_click=go, args=("home",))
+        with c_rubric:
+            with st.popover("ℹ️  Scoring rubric"):
+                rubric_content(view)
+    with c_toggle:
         icon = "🌙" if st.session_state.dark else "☀️"
         st.button(icon, key="theme_toggle", on_click=toggle_theme,
                   help="Switch light / dark mode")
-    if view != "home":
-        with cols[1]:
-            st.button("←  Back", key=f"back_{view}", on_click=go, args=("home",))
-        with cols[2]:
-            with st.popover("ℹ️  Scoring rubric"):
-                rubric_content(view)
+    with c_priv:
+        with st.popover("🔒 Privacy"):
+            privacy_content()
 
 
 # ---------------------------------------------------------------------------
