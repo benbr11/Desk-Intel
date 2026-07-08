@@ -117,16 +117,20 @@ _CSS = """
   button[kind="primary"] { background-color:%(accent)s !important; border-color:%(accent)s !important;
       color:#ffffff !important; padding:0.75rem 0; font-size:1.05rem; }
 
-  /* selectbox / inputs / dropdown -- force onto the themed surface */
-  .stSelectbox div[data-baseweb="select"] > div,
-  div[data-baseweb="select"] > div,
-  div[data-baseweb="select"] > div > div { background-color:%(inp)s !important;
+  /* selectbox / inputs / dropdown -- force every layer onto the themed surface */
+  [data-testid="stSelectbox"] div[data-baseweb="select"] div,
+  [data-testid="stSelectbox"] div[data-baseweb="base-input"],
+  div[data-baseweb="select"] > div { background-color:%(inp)s !important;
       border-color:%(border)s !important; }
-  div[data-baseweb="select"] * { color:%(text)s !important; }
+  div[data-baseweb="select"] *, [data-testid="stSelectbox"] * { color:%(text)s !important; }
   div[data-baseweb="select"] svg { fill:%(text)s !important; }
   ul[role="listbox"], div[data-baseweb="menu"], div[data-baseweb="popover"] div[role="listbox"] {
       background-color:%(inp)s !important; }
   ul[role="listbox"] li, div[data-baseweb="menu"] li { color:%(text)s !important; }
+
+  /* Back button follows the themed surface in dark mode */
+  .st-key-back_axe button, .st-key-back_brief button { background-color:%(inp)s !important;
+      color:%(text)s !important; border-color:%(border)s !important; }
   [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { color:%(text)s !important; }
 
   /* theme toggle -- borderless icon button, top-left */
