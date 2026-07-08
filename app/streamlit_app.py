@@ -1,8 +1,9 @@
-"""Salient -- Sales & Trading desk assistant.
+"""Axurry -- Sales & Trading desk assistant.
 
 Landing page shows two boxes (Axe Matcher | Pre-Call Brief). Click a box to open
-that tool full-screen; a Back button returns home. Nothing is shown until you pick
-a tool, so the home screen stays clean.
+that tool full-screen; a Back button returns home. A ☀️/🌙 toggle (top-left)
+switches light/dark mode. Each view has a subtle colour undertone: purple (home),
+blue (Axe Matcher), red (Pre-Call Brief).
 
 Run:  python -m streamlit run app/streamlit_app.py
 """
@@ -32,8 +33,7 @@ st.set_page_config(page_title=APP_NAME, layout="wide", page_icon="📈",
 
 
 # ---------------------------------------------------------------------------
-# Shared setup (provider cached so the world is stable; results cached so
-# flipping expanders / sliders doesn't recompute needlessly).
+# Data / engine (provider cached; results cached by id)
 # ---------------------------------------------------------------------------
 @st.cache_resource
 def get_provider() -> SyntheticProvider:
@@ -47,7 +47,6 @@ brief_builder = BriefBuilder(provider)
 
 @st.cache_data(show_spinner=False)
 def ranked_for(axe_id: str):
-    """All clients ranked for an axe (cached by axe id)."""
     return matcher.rank_clients_for(provider.get_axe(axe_id))
 
 
@@ -56,38 +55,118 @@ def brief_for(client_id: str):
     return brief_builder.build_brief(provider.get_client(client_id))
 
 
+# ---------------------------------------------------------------------------
+# Session state
+# ---------------------------------------------------------------------------
 if "view" not in st.session_state:
     st.session_state.view = "home"
+if "dark" not in st.session_state:
+    st.session_state.dark = False
 
 
 def go(view: str) -> None:
     st.session_state.view = view
 
 
-# ---------------------------------------------------------------------------
-# Styling
-# ---------------------------------------------------------------------------
-st.markdown(
-    """
-    <style>
-      .block-container { max-width: 1200px; padding-top: 2.5rem; }
-      .di-hero { text-align:center; margin: 1rem 0 2.6rem 0; }
-      .di-hero h1 { font-size: 3rem; margin-bottom: 0.3rem; letter-spacing:-0.5px; }
-      .di-hero p  { color:#6b7280; font-size: 1.15rem; margin:0; }
-      .di-card { padding: 1.6rem 1.4rem 0.8rem 1.4rem; min-height: 260px; }
-      .di-card .ico  { font-size: 3.6rem; }
-      .di-card .ttl  { font-size: 1.9rem; font-weight: 700; margin-top:0.6rem; }
-      .di-card .sub  { color:#6b7280; font-size: 1.08rem; line-height:1.5;
-                       min-height: 4.4em; margin-top:0.6rem; }
-      div[data-testid="stButton"] > button { border-radius: 10px; font-weight:600; }
-      section.main div[data-testid="column"] div[data-testid="stButton"] > button {
-        padding: 0.8rem 0; font-size: 1.05rem; }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+def toggle_theme() -> None:
+    st.session_state.dark = not st.session_state.dark
 
 
+# ---------------------------------------------------------------------------
+# Theming -- per-view accent + light/dark, injected as CSS each run.
+# Undertones are deliberately soft (subtle backgrounds, not bright fills).
+# ---------------------------------------------------------------------------
+THEME = {
+    "home":  dict(accent_l="#7c3aed", accent_d="#a78bfa", bg_l="#f5f2fb", bg_d="#151221", card_d="#1f1b2d"),
+    "axe":   dict(accent_l="#2563eb", accent_d="#60a5fa", bg_l="#eef4fd", bg_d="#0f1522", card_d="#161d2f"),
+    "brief": dict(accent_l="#dc2626", accent_d="#f87171", bg_l="#fdf2f2", bg_d="#1c1114", card_d="#2a1a1d"),
+}
+
+_CSS = """
+<style>
+  .block-container { max-width: 1200px; padding-top: 1rem; }
+  .stApp { background-color: %(bg)s; color: %(text)s; }
+  h1,h2,h3,h4,h5,h6, p, span, label, li { color: %(text)s; }
+  [data-testid="stMarkdownContainer"] { color: %(text)s; }
+
+  .di-hero { text-align:center; margin: 0.6rem 0 2.4rem 0; }
+  .di-hero h1 { font-size: 3rem; margin-bottom: 0.3rem; letter-spacing:-0.5px; color:%(text)s; }
+  .di-hero p  { font-size: 1.15rem; margin:0; color:%(muted)s; }
+  .di-card { padding: 1.6rem 1.4rem 0.8rem 1.4rem; min-height: 260px; }
+  .di-card .ico { font-size: 3.6rem; }
+  .di-card .ttl { font-size: 1.9rem; font-weight:700; margin-top:0.6rem; color:%(text)s; }
+  .di-card .sub { font-size:1.08rem; line-height:1.5; min-height:4.4em; margin-top:0.6rem; color:%(muted)s; }
+  [data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p { color:%(muted)s !important; }
+
+  /* cards / bordered containers -- soft accent-tinted border */
+  [data-testid="stVerticalBlockBorderWrapper"] { border-color:%(accent_soft)s !important;
+      border-radius:12px; background-color:%(card)s; }
+  [data-testid="stVerticalBlockBorderWrapper"] > div { background-color:%(card)s; }
+
+  /* expanders */
+  [data-testid="stExpander"] { background-color:%(card)s; border:1px solid %(border)s; border-radius:10px; }
+  [data-testid="stExpander"] summary, [data-testid="stExpander"] summary span,
+  [data-testid="stExpander"] summary p { color:%(text)s !important; }
+
+  /* buttons */
+  div[data-testid="stButton"] > button { border-radius:10px; font-weight:600; }
+  button[kind="primary"] { background-color:%(accent)s !important; border-color:%(accent)s !important;
+      color:#ffffff !important; padding:0.75rem 0; font-size:1.05rem; }
+
+  /* selectbox / inputs / dropdown */
+  div[data-baseweb="select"] > div { background-color:%(inp)s !important; color:%(text)s !important;
+      border-color:%(border)s !important; }
+  div[data-baseweb="select"] span, div[data-baseweb="select"] input { color:%(text)s !important; }
+  ul[role="listbox"], div[data-baseweb="menu"] { background-color:%(inp)s !important; }
+  ul[role="listbox"] li { color:%(text)s !important; }
+  [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { color:%(text)s !important; }
+
+  /* theme toggle -- borderless icon button, top-left */
+  .st-key-theme_toggle button { border:none !important; background:transparent !important;
+      font-size:1.5rem !important; padding:0.1rem 0.4rem !important; box-shadow:none !important; }
+  .st-key-theme_toggle button:hover { transform:scale(1.12); }
+  %(extra)s
+</style>
+"""
+
+
+def inject_theme(view: str) -> None:
+    dark = st.session_state.dark
+    t = THEME[view]
+    axe_t, brief_t = THEME["axe"], THEME["brief"]
+    if dark:
+        v = dict(bg=t["bg_d"], text="#e5e7eb", muted="#9aa4b2", card=t["card_d"],
+                 accent=t["accent_d"], inp="#1f2530", border="rgba(148,163,184,0.20)",
+                 blue=axe_t["accent_d"], red=brief_t["accent_d"])
+    else:
+        v = dict(bg=t["bg_l"], text="#0f172a", muted="#64748b", card="#ffffff",
+                 accent=t["accent_l"], inp="#ffffff", border="rgba(15,23,42,0.10)",
+                 blue=axe_t["accent_l"], red=brief_t["accent_l"])
+    v["accent_soft"] = v["accent"] + "44"
+    if view == "home":
+        v["extra"] = (
+            ".st-key-open_axe button{background-color:%(blue)s!important;border-color:%(blue)s!important;}"
+            ".st-key-open_brief button{background-color:%(red)s!important;border-color:%(red)s!important;}"
+        ) % v
+    else:
+        v["extra"] = ""
+    st.markdown(_CSS % v, unsafe_allow_html=True)
+
+
+def render_topbar(view: str) -> None:
+    cols = st.columns([1, 1.4, 9])
+    with cols[0]:
+        icon = "🌙" if st.session_state.dark else "☀️"
+        st.button(icon, key="theme_toggle", on_click=toggle_theme,
+                  help="Switch light / dark mode")
+    if view != "home":
+        with cols[1]:
+            st.button("←  Back", key=f"back_{view}", on_click=go, args=("home",))
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 def score_badge(score: float) -> str:
     color = "#16a34a" if score >= 65 else "#ca8a04" if score >= 40 else "#9ca3af"
     return (f"<span style='background:{color};color:white;padding:2px 9px;"
@@ -107,7 +186,6 @@ _FACTOR_ORDER = ("mandate", "holdings", "history", "recency")
 
 
 def rubric_box(context: str) -> None:
-    """Explainer shown at the top of each tool: how the match rating is built."""
     with st.expander("ℹ️  How the match rating is calculated", expanded=True):
         st.markdown(
             "**Match rating (0–100)** is a weighted blend of four factors — "
@@ -129,7 +207,6 @@ def rubric_box(context: str) -> None:
 
 
 def score_breakdown(m) -> None:
-    """Show how each factor contributed to a client's match score."""
     for k in _FACTOR_ORDER:
         raw, detail = m.components[k]
         pts = WEIGHTS[k] * raw * 100
@@ -144,6 +221,7 @@ def score_breakdown(m) -> None:
 # HOME
 # ===========================================================================
 def render_home() -> None:
+    render_topbar("home")
     st.markdown(
         f"<div class='di-hero'><h1>📈 {APP_NAME}</h1>"
         f"<p>{APP_TAGLINE} — pick a tool to begin.</p></div>",
@@ -183,7 +261,7 @@ def render_home() -> None:
 # TOOL 1 -- Axe Matcher
 # ===========================================================================
 def render_axe_matcher() -> None:
-    st.button("←  Back", on_click=go, args=("home",), key="back_axe")
+    render_topbar("axe")
     st.markdown("## 🎯 Axe Matcher")
     st.caption("The desk has risk to move. Who do you call?")
     rubric_box("axe")
@@ -213,7 +291,7 @@ def render_axe_matcher() -> None:
                 star = " ⭐" if i == 1 else ""
                 st.markdown(
                     f"**{i}. {m.client.name}**{star}  \n"
-                    f"<span style='color:#6b7280;font-size:0.85em'>{m.client.type} · "
+                    f"<span style='color:#94a3b8;font-size:0.85em'>{m.client.type} · "
                     f"{m.client.risk_appetite} risk</span>", unsafe_allow_html=True)
             with c2:
                 st.markdown(f"<div style='text-align:right'>Match {score_badge(m.score)}</div>",
@@ -236,7 +314,7 @@ def render_axe_matcher() -> None:
 # TOOL 2 -- Pre-Call Brief
 # ===========================================================================
 def render_pre_call_brief() -> None:
-    st.button("←  Back", on_click=go, args=("home",), key="back_brief")
+    render_topbar("brief")
     st.markdown("## 📇 Pre-Call Brief")
     st.caption("About to call a client? Here's everything you should know.")
     rubric_box("brief")
@@ -249,7 +327,7 @@ def render_pre_call_brief() -> None:
 
     st.markdown(
         f"**{client.name}** &nbsp;·&nbsp; {client.type} &nbsp;·&nbsp; {client.risk_appetite} risk  \n"
-        f"<span style='color:#6b7280;font-size:0.9em'>Mandate: "
+        f"<span style='color:#94a3b8;font-size:0.9em'>Mandate: "
         f"{', '.join(client.credit_mandate + client.duration_mandate)} &nbsp;|&nbsp; "
         f"Tilts: {', '.join(client.sector_tilts)}</span>", unsafe_allow_html=True)
 
@@ -308,6 +386,7 @@ def render_pre_call_brief() -> None:
 # Router
 # ===========================================================================
 view = st.session_state.view
+inject_theme(view)
 if view == "axe":
     render_axe_matcher()
 elif view == "brief":

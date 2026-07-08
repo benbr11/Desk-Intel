@@ -30,6 +30,16 @@ def test_home_shows_two_boxes_and_no_data():
 
 
 @pytest.mark.skipif(not _HAS_STREAMLIT, reason="streamlit not installed")
+def test_theme_toggle_does_not_crash():
+    at = _app().run()
+    next(b for b in at.button if b.key == "theme_toggle").click().run()
+    assert not at.exception
+    # Still on a clean home after toggling.
+    keys = {b.key for b in at.button}
+    assert {"open_axe", "open_brief"} <= keys
+
+
+@pytest.mark.skipif(not _HAS_STREAMLIT, reason="streamlit not installed")
 def test_can_open_axe_matcher():
     at = _app().run()
     next(b for b in at.button if b.key == "open_axe").click().run()
