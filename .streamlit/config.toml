@@ -1,0 +1,11 @@
+# Brand theme for Salient. Keeps the look consistent locally and when deployed.
+[theme]
+base = "light"
+primaryColor = "#2563EB"          # actions / primary buttons
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F1F5F9"
+textColor = "#0F172A"
+font = "sans serif"
+
+[client]
+toolbarMode = "minimal"

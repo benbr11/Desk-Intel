@@ -1,12 +1,16 @@
-# DeskIntel
+# Salient
 
 **A sales & trading desk assistant that turns desk risk into a ranked call list — and preps every client call in one click.**
 
-DeskIntel opens to a single split screen:
+*(Repository name: `Desk-Intel`.)*
 
-| ① Axe Matcher (left) | ② Pre-Call Brief (right) |
+Salient opens to a clean landing page with **two boxes**; click one to open that tool full-screen:
+
+| 🎯 Axe Matcher | 📇 Pre-Call Brief |
 |---|---|
-| The desk has risk to move (an *axe*). Pick it → get a **ranked list of which clients to call**, each with a plain-English reason *why* and a draft outreach line. | About to call a client? Pick them → get a **one-pager**: their book, recent trades with the desk, overnight P&L moves, and which live axes fit them. |
+| The desk has risk to move (an *axe*). Pick it → get a **ranked list of which clients to call**, each with a match score, a plain-English reason *why*, a per-factor score breakdown, and a draft outreach line. | About to call a client? Pick them → get a **one-pager**: their book, recent trades with the desk, overnight P&L moves, and which live axes fit them. |
+
+Each tool shows a rubric box up top explaining exactly how the match rating is calculated.
 
 It runs today on a **manufactured (synthetic) universe** — no real client, portfolio, or trade data
 required. A real bank feed later drops in behind the same interface with **zero changes to the engine or UI**.
@@ -20,7 +24,7 @@ A salesperson sits between two sides:
 - **Supply** — the desk's traders hold risk/inventory they need to move (*axes*).
 - **Demand** — institutional clients (pensions, insurers, asset managers, hedge funds) who might want it.
 
-The whole job is matching the two. Today that's mostly memory, gut, and a mass "run" email. DeskIntel
+The whole job is matching the two. Today that's mostly memory, gut, and a mass "run" email. Salient
 makes the matching explicit: it scores every client against an axe on the same things a good
 salesperson weighs — **mandate fit, existing holdings, trading history with the desk, and recent
 activity** — then ranks them and drafts the pitch.

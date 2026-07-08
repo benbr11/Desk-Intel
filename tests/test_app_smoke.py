@@ -22,7 +22,7 @@ def test_home_shows_two_boxes_and_no_data():
     at = _app().run()
     assert not at.exception, f"App raised: {at.exception}"
     md = " ".join(m.value for m in at.markdown)
-    assert "DeskIntel" in md
+    assert "Salient" in md
     # Two entry buttons, and NO tool selectbox on the landing page.
     keys = {b.key for b in at.button}
     assert {"open_axe", "open_brief"} <= keys
