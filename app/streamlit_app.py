@@ -86,8 +86,20 @@ _CSS = """
 <style>
   .block-container { max-width: 1200px; padding-top: 3.75rem; }
   .stApp { background-color: %(bg)s; color: %(text)s; }
-  h1,h2,h3,h4,h5,h6, p, span, label, li { color: %(text)s; }
-  [data-testid="stMarkdownContainer"] { color: %(text)s; }
+  /* Force standard text onto the themed colour so it can never end up
+     light-on-light or dark-on-dark when switching modes. NB: we deliberately do
+     NOT target <span>, so inline-coloured spans (badges, colour keys) keep their
+     own colour. */
+  [data-testid="stMarkdownContainer"], [data-testid="stMarkdownContainer"] p,
+  [data-testid="stMarkdownContainer"] li, [data-testid="stMarkdownContainer"] strong,
+  [data-testid="stMarkdownContainer"] em, [data-testid="stMarkdownContainer"] td,
+  [data-testid="stMarkdownContainer"] th,
+  [data-testid="stMarkdownContainer"] h1, [data-testid="stMarkdownContainer"] h2,
+  [data-testid="stMarkdownContainer"] h3, [data-testid="stMarkdownContainer"] h4,
+  [data-testid="stMarkdownContainer"] h5, [data-testid="stMarkdownContainer"] h6,
+  [data-testid="stHeading"], [data-testid="stHeadingContainer"],
+  [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
+  [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { color: %(text)s !important; }
 
   .di-hero { text-align:center; margin: 0.6rem 0 2.4rem 0; }
   .di-hero h1 { font-size: 3rem; margin-bottom: 0.3rem; letter-spacing:-0.5px; color:%(text)s; }
@@ -193,47 +205,93 @@ def score_badge(score: float) -> str:
 
 
 _FACTOR_DESC = {
-    "mandate": ("Mandate fit", "Is the bond in the client's mandate — credit quality "
-                               "(IG/HY), duration, and sector?"),
-    "holdings": ("Holdings overlap", "Do they already own similar bonds — same sector, "
-                                     "close rating and duration?"),
-    "history": ("Trading history", "Have they traded this sector with the desk before, "
-                                   "on the side we now need?"),
-    "recency": ("Recency", "How recently they've been active in this sector."),
+    "mandate": ("Mandate fit", "Is it eligible and on-strategy — credit quality (IG/HY), "
+                               "duration band, and stated sector preference? (graded by distance)"),
+    "portfolio": ("Portfolio fit", "Does it sit naturally in their book — same issuer/sector, "
+                                   "similar rating and tenor, meaningful weight?"),
+    "direction": ("Directional fit", "Are they on the side the desk needs? To sell we want room "
+                                     "to buy; to source we want a holder who might trim — so "
+                                     "concentration cuts both ways."),
+    "flow": ("Flow history", "Have they traded this sector with the desk on the side we now "
+                             "need, and how recently? (recency-weighted)"),
+    "size": ("Size fit", "Can they absorb the ticket, given their typical trade size and book?"),
 }
-_FACTOR_ORDER = ("mandate", "holdings", "history", "recency")
+_FACTOR_ORDER = ("mandate", "portfolio", "direction", "flow", "size")
 
 
 def rubric_content(context: str) -> None:
     """Rubric explainer -- rendered inside the top-left 'Scoring rubric' popover."""
     st.markdown(
-        "**Match rating (0–100)** is a weighted blend of four factors — "
-        "the same things a good salesperson weighs by instinct:")
+        "**Match score (0–100)** estimates how likely a client is to trade a given axe. "
+        "It is a weighted blend of five fit factors, then scaled by a hard **eligibility "
+        "gate**:")
+    st.markdown(
+        "<div style='font-family:monospace;font-size:0.9em'>"
+        "score = 100 × Σ(weightᵢ × factorᵢ) × eligibility</div>",
+        unsafe_allow_html=True)
+
     rows = "\n".join(
         f"| {_FACTOR_DESC[k][0]} | **{int(WEIGHTS[k] * 100)}%** | {_FACTOR_DESC[k][1]} |"
         for k in _FACTOR_ORDER)
     st.markdown("| Factor | Weight | What it measures |\n|---|---|---|\n" + rows)
+
     st.markdown(
-        "**Rating colour:** &nbsp; "
+        "**Why it's direction-aware (the core idea).** Sales is a matching problem: the desk "
+        "has *supply* of risk, clients have latent *demand*. Which client fits depends on the "
+        "desk's side:\n"
+        "- **Desk SELLS** (offering bonds) → we want a **buyer**: mandate headroom, room to add, "
+        "a stated appetite for the sector. Being *over-concentrated* in the name **hurts** — no room.\n"
+        "- **Desk SOURCES** (bidding for bonds) → we want a **holder who might trim**: they must "
+        "already own it, and being *over-weight* **helps**. You can't source from someone who "
+        "doesn't hold it.")
+
+    st.markdown(
+        "**Eligibility gate (×).** Some fits are hard no-gos and collapse the score no matter how "
+        "good the other signals look — because a salesperson simply wouldn't make that call:\n"
+        "- High-yield bond into an **IG-only** mandate → ×0.10 (ineligible)\n"
+        "- IG bond into a **HY-only** mandate → ×0.55 (off-strategy)\n"
+        "- Deep-HY (B+ or worse) into a **low-risk** account → ×0.40\n"
+        "- Maturity far beyond the client's **duration band** → ×0.70")
+
+    st.markdown(
+        "**Grading, not buckets.** Credit-quality, rating and duration fit decay smoothly with "
+        "distance (e.g. a 7y bond vs a 4–9y band scores full; a 12y bond scores partial).")
+
+    st.markdown(
+        "**Score bands:** &nbsp; "
         "<span style='color:#16a34a;font-weight:600'>● 65–100 strong — call first</span> &nbsp;·&nbsp; "
         "<span style='color:#ca8a04;font-weight:600'>● 40–64 worth a look</span> &nbsp;·&nbsp; "
         "<span style='color:#9ca3af;font-weight:600'>● 0–39 low priority</span>",
         unsafe_allow_html=True)
+
+    st.caption(
+        "Decision support, not autopilot — relationships and judgement stay with the human. "
+        "Weights are deliberately simple and visible so every number is defensible; on real data "
+        "they would be tuned/back-tested against realised hit rates.")
     if context == "brief":
         st.caption(
-            "The *Relevant live axes* below are scored with this same rubric. "
+            "The *Relevant live axes* below are scored with this same model. "
             "Overnight P&L ≈ position size × bond duration × overnight yield move.")
 
 
 def score_breakdown(m) -> None:
+    base = 0.0
     for k in _FACTOR_ORDER:
         raw, detail = m.components[k]
         pts = WEIGHTS[k] * raw * 100
-        st.markdown(f"**{_FACTOR_DESC[k][0]}** &nbsp;<span style='color:#6b7280'>"
+        base += pts
+        st.markdown(f"**{_FACTOR_DESC[k][0]}** &nbsp;<span style='color:#94a3b8'>"
                     f"({int(WEIGHTS[k] * 100)}% weight)</span> &nbsp;→&nbsp; **+{pts:.0f} pts**",
                     unsafe_allow_html=True)
         st.progress(min(1.0, max(0.0, raw)))
         st.caption(detail)
+    mult, note = m.eligibility
+    st.divider()
+    if mult < 0.999:
+        st.markdown(f"**Base {base:.0f}**  ×  **eligibility {mult:.2f}**"
+                    + (f" &nbsp;<span style='color:#94a3b8'>({note})</span>" if note else ""),
+                    unsafe_allow_html=True)
+    st.markdown(f"### Final match score: {m.score:.0f}")
 
 
 # ===========================================================================
