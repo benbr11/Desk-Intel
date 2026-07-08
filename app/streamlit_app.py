@@ -128,9 +128,13 @@ _CSS = """
       background-color:%(inp)s !important; }
   ul[role="listbox"] li, div[data-baseweb="menu"] li { color:%(text)s !important; }
 
-  /* Back button follows the themed surface in dark mode */
-  .st-key-back_axe button, .st-key-back_brief button { background-color:%(inp)s !important;
+  /* Back button + rubric popover trigger follow the themed surface */
+  .st-key-back_axe button, .st-key-back_brief button,
+  [data-testid="stPopover"] button { background-color:%(inp)s !important;
       color:%(text)s !important; border-color:%(border)s !important; }
+  /* rubric popover panel */
+  [data-testid="stPopoverBody"], div[data-baseweb="popover"] [data-testid="stPopoverBody"] {
+      background-color:%(card)s !important; }
   [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { color:%(text)s !important; }
 
   /* theme toggle -- borderless icon button, top-left */
@@ -166,7 +170,7 @@ def inject_theme(view: str) -> None:
 
 
 def render_topbar(view: str) -> None:
-    cols = st.columns([1, 1.4, 9])
+    cols = st.columns([0.8, 1.2, 2, 8])
     with cols[0]:
         icon = "🌙" if st.session_state.dark else "☀️"
         st.button(icon, key="theme_toggle", on_click=toggle_theme,
@@ -174,6 +178,9 @@ def render_topbar(view: str) -> None:
     if view != "home":
         with cols[1]:
             st.button("←  Back", key=f"back_{view}", on_click=go, args=("home",))
+        with cols[2]:
+            with st.popover("ℹ️  Scoring rubric"):
+                rubric_content(view)
 
 
 # ---------------------------------------------------------------------------
@@ -197,25 +204,25 @@ _FACTOR_DESC = {
 _FACTOR_ORDER = ("mandate", "holdings", "history", "recency")
 
 
-def rubric_box(context: str) -> None:
-    with st.expander("ℹ️  How the match rating is calculated", expanded=True):
-        st.markdown(
-            "**Match rating (0–100)** is a weighted blend of four factors — "
-            "the same things a good salesperson weighs by instinct:")
-        rows = "\n".join(
-            f"| {_FACTOR_DESC[k][0]} | **{int(WEIGHTS[k] * 100)}%** | {_FACTOR_DESC[k][1]} |"
-            for k in _FACTOR_ORDER)
-        st.markdown("| Factor | Weight | What it measures |\n|---|---|---|\n" + rows)
-        st.markdown(
-            "**Rating colour:** &nbsp; "
-            "<span style='color:#16a34a;font-weight:600'>● 65–100 strong — call first</span> &nbsp;·&nbsp; "
-            "<span style='color:#ca8a04;font-weight:600'>● 40–64 worth a look</span> &nbsp;·&nbsp; "
-            "<span style='color:#9ca3af;font-weight:600'>● 0–39 low priority</span>",
-            unsafe_allow_html=True)
-        if context == "brief":
-            st.caption(
-                "The *Relevant live axes* below are scored with this same rubric. "
-                "Overnight P&L ≈ position size × bond duration × overnight yield move.")
+def rubric_content(context: str) -> None:
+    """Rubric explainer -- rendered inside the top-left 'Scoring rubric' popover."""
+    st.markdown(
+        "**Match rating (0–100)** is a weighted blend of four factors — "
+        "the same things a good salesperson weighs by instinct:")
+    rows = "\n".join(
+        f"| {_FACTOR_DESC[k][0]} | **{int(WEIGHTS[k] * 100)}%** | {_FACTOR_DESC[k][1]} |"
+        for k in _FACTOR_ORDER)
+    st.markdown("| Factor | Weight | What it measures |\n|---|---|---|\n" + rows)
+    st.markdown(
+        "**Rating colour:** &nbsp; "
+        "<span style='color:#16a34a;font-weight:600'>● 65–100 strong — call first</span> &nbsp;·&nbsp; "
+        "<span style='color:#ca8a04;font-weight:600'>● 40–64 worth a look</span> &nbsp;·&nbsp; "
+        "<span style='color:#9ca3af;font-weight:600'>● 0–39 low priority</span>",
+        unsafe_allow_html=True)
+    if context == "brief":
+        st.caption(
+            "The *Relevant live axes* below are scored with this same rubric. "
+            "Overnight P&L ≈ position size × bond duration × overnight yield move.")
 
 
 def score_breakdown(m) -> None:
@@ -275,8 +282,8 @@ def render_home() -> None:
 def render_axe_matcher() -> None:
     render_topbar("axe")
     st.markdown("## 🎯 Axe Matcher")
-    st.caption("The desk has risk to move. Who do you call?")
-    rubric_box("axe")
+    st.caption("The desk has risk to move. Who do you call?  "
+               "*(Scoring rubric is in the top-left ℹ️ button.)*")
 
     axes = provider.get_axes()
     axe = st.selectbox("Select a desk axe", options=axes,
@@ -328,8 +335,8 @@ def render_axe_matcher() -> None:
 def render_pre_call_brief() -> None:
     render_topbar("brief")
     st.markdown("## 📇 Pre-Call Brief")
-    st.caption("About to call a client? Here's everything you should know.")
-    rubric_box("brief")
+    st.caption("About to call a client? Here's everything you should know.  "
+               "*(Scoring rubric is in the top-left ℹ️ button.)*")
 
     clients = sorted(provider.get_clients(), key=lambda c: c.name)
     client = st.selectbox("Select a client", options=clients,
