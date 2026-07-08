@@ -84,7 +84,7 @@ THEME = {
 
 _CSS = """
 <style>
-  .block-container { max-width: 1200px; padding-top: 1rem; }
+  .block-container { max-width: 1200px; padding-top: 3.75rem; }
   .stApp { background-color: %(bg)s; color: %(text)s; }
   h1,h2,h3,h4,h5,h6, p, span, label, li { color: %(text)s; }
   [data-testid="stMarkdownContainer"] { color: %(text)s; }
