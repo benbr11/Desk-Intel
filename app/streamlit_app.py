@@ -103,22 +103,30 @@ _CSS = """
       border-radius:12px; background-color:%(card)s; }
   [data-testid="stVerticalBlockBorderWrapper"] > div { background-color:%(card)s; }
 
-  /* expanders */
+  /* expanders -- header bar + body both follow the card colour */
   [data-testid="stExpander"] { background-color:%(card)s; border:1px solid %(border)s; border-radius:10px; }
+  [data-testid="stExpander"] details { background-color:%(card)s !important; }
+  [data-testid="stExpander"] summary { background-color:%(card)s !important; }
+  [data-testid="stExpanderDetails"] { background-color:%(card)s !important; }
   [data-testid="stExpander"] summary, [data-testid="stExpander"] summary span,
-  [data-testid="stExpander"] summary p { color:%(text)s !important; }
+  [data-testid="stExpander"] summary p, [data-testid="stExpander"] summary svg { color:%(text)s !important;
+      fill:%(text)s !important; }
 
   /* buttons */
   div[data-testid="stButton"] > button { border-radius:10px; font-weight:600; }
   button[kind="primary"] { background-color:%(accent)s !important; border-color:%(accent)s !important;
       color:#ffffff !important; padding:0.75rem 0; font-size:1.05rem; }
 
-  /* selectbox / inputs / dropdown */
-  div[data-baseweb="select"] > div { background-color:%(inp)s !important; color:%(text)s !important;
+  /* selectbox / inputs / dropdown -- force onto the themed surface */
+  .stSelectbox div[data-baseweb="select"] > div,
+  div[data-baseweb="select"] > div,
+  div[data-baseweb="select"] > div > div { background-color:%(inp)s !important;
       border-color:%(border)s !important; }
-  div[data-baseweb="select"] span, div[data-baseweb="select"] input { color:%(text)s !important; }
-  ul[role="listbox"], div[data-baseweb="menu"] { background-color:%(inp)s !important; }
-  ul[role="listbox"] li { color:%(text)s !important; }
+  div[data-baseweb="select"] * { color:%(text)s !important; }
+  div[data-baseweb="select"] svg { fill:%(text)s !important; }
+  ul[role="listbox"], div[data-baseweb="menu"], div[data-baseweb="popover"] div[role="listbox"] {
+      background-color:%(inp)s !important; }
+  ul[role="listbox"] li, div[data-baseweb="menu"] li { color:%(text)s !important; }
   [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { color:%(text)s !important; }
 
   /* theme toggle -- borderless icon button, top-left */
