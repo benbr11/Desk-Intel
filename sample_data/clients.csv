@@ -1,0 +1,25 @@
+id,name,type,risk_appetite,credit_mandate,duration_mandate,sector_tilts
+C000,Redwood Pension,Pension Fund,low,IG-credit,long-duration|core-duration,Industrials|Healthcare
+C001,Provident Life,Insurer,low,IG-credit,long-duration,Healthcare|Technology|Telecom
+C002,Northwind Advisors,Asset Manager,medium,IG-credit|crossover,core-duration|short-duration,Energy|Real Estate|Financials
+C003,Vireo Capital,Hedge Fund,high,high-yield|crossover,short-duration|core-duration,Real Estate|Industrials|Materials
+C004,Granite Public Retirement,Pension Fund,low,IG-credit,long-duration|core-duration,Technology|Consumer
+C005,Everest Insurance,Insurer,low,IG-credit,long-duration,Telecom|Industrials
+C006,Bluepeak Asset Mgmt,Asset Manager,medium,IG-credit|crossover,core-duration|short-duration,Consumer|Utilities|Energy
+C007,Blackford Partners,Hedge Fund,high,high-yield|crossover,short-duration|core-duration,Materials|Consumer|Financials
+C008,Ironclad Retirement,Pension Fund,low,IG-credit,long-duration|core-duration,Financials|Real Estate
+C009,Beacon Assurance,Insurer,low,IG-credit,long-duration,Financials|Technology
+C010,Silverline Asset Mgmt,Asset Manager,medium,IG-credit|crossover,core-duration|short-duration,Consumer|Materials
+C011,Tesseract Fund,Hedge Fund,high,high-yield|crossover,short-duration|core-duration,Industrials|Real Estate|Utilities
+C012,Meadowlark Pension,Pension Fund,low,IG-credit,long-duration|core-duration,Utilities|Consumer|Financials
+C013,Cornerstone Assurance,Insurer,low,IG-credit,long-duration,Real Estate|Energy
+C014,Meridian Investors,Asset Manager,medium,IG-credit|crossover,core-duration|short-duration,Telecom|Materials
+C015,Onyx Credit Partners,Hedge Fund,high,high-yield|crossover,short-duration|core-duration,Materials|Healthcare
+C016,Harborview Pension,Pension Fund,low,IG-credit,long-duration|core-duration,Materials|Consumer
+C017,Sentinel Life,Insurer,low,IG-credit,long-duration,Utilities|Healthcare
+C018,Kestrel Capital Mgmt,Asset Manager,medium,IG-credit|crossover,core-duration|short-duration,Telecom|Technology
+C019,Riptide Macro,Hedge Fund,high,high-yield|crossover,short-duration|core-duration,Real Estate|Utilities
+C020,State Teachers Fund,Pension Fund,low,IG-credit,long-duration|core-duration,Utilities|Healthcare|Financials
+C021,Coastal Mutual,Insurer,low,IG-credit,long-duration,Consumer|Healthcare|Financials
+C022,Aldergate Investors,Asset Manager,medium,IG-credit|crossover,core-duration|short-duration,Healthcare|Financials|Technology
+C023,Halcyon Capital,Hedge Fund,high,high-yield|crossover,short-duration|core-duration,Utilities|Telecom

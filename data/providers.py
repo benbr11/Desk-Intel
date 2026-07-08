@@ -46,11 +46,14 @@ class DeskDataProvider(ClientProvider, AxeProvider, MarketProvider, ABC):
 
 
 # ---------------------------------------------------------------------------
-# The default provider used today: a manufactured world.
+# UniverseProvider: wraps a fully-built Universe. EVERY real-data source
+# (CSV / SQL / API in data/loaders.py) builds a Universe and hands it here, so
+# the engine and UI treat all sources identically. Swapping data = swap the
+# provider; the engine never changes.
 # ---------------------------------------------------------------------------
-class SyntheticProvider(DeskDataProvider):
-    def __init__(self, universe: Universe | None = None, **gen_kwargs):
-        self._u = universe or generate_universe(**gen_kwargs)
+class UniverseProvider(DeskDataProvider):
+    def __init__(self, universe: Universe):
+        self._u = universe
 
     @property
     def universe(self) -> Universe:
@@ -67,6 +70,12 @@ class SyntheticProvider(DeskDataProvider):
 
     def overnight_move_bp(self, instrument_id: str) -> float:
         return self._u.overnight_bp.get(instrument_id, 0.0)
+
+
+# The default provider used for the public demo: a manufactured world.
+class SyntheticProvider(UniverseProvider):
+    def __init__(self, universe: Universe | None = None, **gen_kwargs):
+        super().__init__(universe or generate_universe(**gen_kwargs))
 
 
 # ---------------------------------------------------------------------------

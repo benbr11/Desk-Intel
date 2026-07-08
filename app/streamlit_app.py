@@ -18,6 +18,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 import pandas as pd
 import streamlit as st
 
+from data.loaders import ApiProvider, CsvProvider, SqlProvider
 from data.providers import SyntheticProvider
 from engine.brief import BriefBuilder
 from engine.match import WEIGHTS, MatchEngine
@@ -33,26 +34,118 @@ st.set_page_config(page_title=APP_NAME, layout="wide", page_icon="📈",
 
 
 # ---------------------------------------------------------------------------
-# Data / engine (provider cached; results cached by id)
+# Data source layer -- synthetic (public demo) OR real data via CSV / SQL / API.
+# The active provider lives in session_state; the engine is rebuilt from it each
+# run (cheap). This is the "plug real data in" seam, made usable from the UI.
+# Real-data modes can be locked behind a password so the deployment stays private
+# (set `app_password`, and optionally `require_login = true`, in Streamlit secrets).
 # ---------------------------------------------------------------------------
 @st.cache_resource
-def get_provider() -> SyntheticProvider:
+def _synthetic_provider() -> SyntheticProvider:
     return SyntheticProvider()
 
 
-provider = get_provider()
-matcher = MatchEngine(provider)
-brief_builder = BriefBuilder(provider)
+def _secret(key: str, default=None):
+    try:
+        return st.secrets[key]
+    except Exception:
+        return default
 
 
-@st.cache_data(show_spinner=False)
-def ranked_for(axe_id: str):
-    return matcher.rank_clients_for(provider.get_axe(axe_id))
+def _active_provider():
+    return st.session_state.get("provider") or _synthetic_provider()
 
 
-@st.cache_data(show_spinner=False)
-def brief_for(client_id: str):
-    return brief_builder.build_brief(provider.get_client(client_id))
+def _require_login_gate() -> None:
+    """Optional full-app lock for a private/internal deployment. Enable by setting
+    `require_login = true` and `app_password = "..."` in Streamlit secrets."""
+    if not _secret("require_login") or st.session_state.get("authed"):
+        return
+    st.markdown(f"## 🔒 {APP_NAME}")
+    st.caption("This deployment is private. Enter the access password to continue.")
+    with st.form("login_gate"):
+        pw = st.text_input("Password", type="password")
+        if st.form_submit_button("Sign in"):
+            if pw and pw == _secret("app_password"):
+                st.session_state.authed = True
+                st.rerun()
+            else:
+                st.error("Incorrect password.")
+    st.stop()
+
+
+def _csv_source_ui() -> None:
+    st.caption("Upload CSVs — templates are in the repo's `sample_data/`.")
+    files = {}
+    for key in ["instruments", "clients", "holdings", "trades", "axes", "overnight"]:
+        up = st.file_uploader(f"{key}.csv", type="csv", key=f"up_{key}")
+        if up is not None:
+            files[key] = up
+    if st.button("Load CSVs", key="load_csv", use_container_width=True):
+        if {"instruments", "clients", "axes"} <= set(files):
+            st.session_state.provider = CsvProvider(files)
+            st.session_state.view = "home"
+        else:
+            st.warning("Need at least instruments.csv, clients.csv and axes.csv.")
+
+
+def _sql_source_ui() -> None:
+    path = st.text_input("SQLite database path", value="sample_data/desk.sqlite", key="sql_path")
+    st.caption("Tables: instruments, clients, holdings, trades, axes, overnight. For "
+               "Postgres/MSSQL/Snowflake the same query pattern applies — swap the connection "
+               "in `load_sqlite()`.")
+    if st.button("Connect", key="load_sql", use_container_width=True):
+        st.session_state.provider = SqlProvider(path)
+        st.session_state.view = "home"
+
+
+def _api_source_ui() -> None:
+    url = st.text_input("API base URL", placeholder="https://desk-api.internal/v1", key="api_url")
+    token = st.text_input("Bearer token (optional)", type="password", key="api_token")
+    st.caption("Expects JSON arrays at /instruments, /clients, /holdings, /trades, /axes, /overnight.")
+    if st.button("Fetch", key="load_api", use_container_width=True) and url:
+        st.session_state.provider = ApiProvider(url, token or None)
+        st.session_state.view = "home"
+
+
+def render_data_source() -> None:
+    """Sidebar: choose where Axurry reads from. Synthetic is open; real sources can
+    be password-gated so the same app is safe to share yet usable on real data."""
+    with st.sidebar:
+        st.markdown(f"### 🔌 {APP_NAME} data")
+        src = st.radio("Data source",
+                       ["Synthetic demo", "CSV upload", "Database (SQLite)", "REST API"],
+                       key="data_source", label_visibility="collapsed")
+        if src == "Synthetic demo":
+            st.session_state.provider = None
+            st.caption("Manufactured demo data — safe to share publicly.")
+            return
+
+        pw = _secret("app_password")
+        if pw and not st.session_state.get("authed"):
+            with st.form("unlock_data"):
+                entered = st.text_input("Access password", type="password")
+                if st.form_submit_button("Unlock") and entered == pw:
+                    st.session_state.authed = True
+                    st.rerun()
+            st.info("Real data is password-protected — enter the access password.")
+            return
+
+        try:
+            if src == "CSV upload":
+                _csv_source_ui()
+            elif src == "Database (SQLite)":
+                _sql_source_ui()
+            else:
+                _api_source_ui()
+        except Exception as exc:  # surface any load error rather than crashing
+            st.session_state.provider = None
+            st.error(f"Could not load data: {exc}")
+
+        p = st.session_state.get("provider")
+        if p is not None:
+            st.success(f"Loaded {len(p.get_clients())} clients · {len(p.get_axes())} axes · "
+                       f"{len(p.get_instruments())} instruments")
 
 
 # ---------------------------------------------------------------------------
@@ -344,6 +437,9 @@ def render_axe_matcher() -> None:
                "*(Scoring rubric is in the top-left ℹ️ button.)*")
 
     axes = provider.get_axes()
+    if not axes:
+        st.info("No axes in the current data source. Load data that includes axes from the sidebar.")
+        return
     axe = st.selectbox("Select a desk axe", options=axes,
                        format_func=lambda a: f"[{a.urgency.upper()}] {a.label()}")
 
@@ -353,8 +449,12 @@ def render_axe_matcher() -> None:
         f"{inst.sector} &nbsp;·&nbsp; {inst.rating} &nbsp;·&nbsp; {inst.maturity_years}y "
         f"&nbsp;·&nbsp; urgency **{axe.urgency}**")
 
-    ranked = ranked_for(axe.id)
-    top_n = st.slider("How many clients to show", 3, min(15, len(ranked)), 8)
+    ranked = matcher.rank_clients_for(axe)
+    if not ranked:
+        st.info("No clients in the current data source.")
+        return
+    n = len(ranked)
+    top_n = st.slider("How many clients to show", 3, min(15, n), min(8, n)) if n > 3 else n
     strong = sum(1 for m in ranked if m.score >= 65)
     st.caption(f"Scored {len(ranked)} clients · {strong} strong fit(s) · "
                f"top match **{ranked[0].client.name}** ({ranked[0].score:.0f}).")
@@ -397,10 +497,13 @@ def render_pre_call_brief() -> None:
                "*(Scoring rubric is in the top-left ℹ️ button.)*")
 
     clients = sorted(provider.get_clients(), key=lambda c: c.name)
+    if not clients:
+        st.info("No clients in the current data source. Load data from the sidebar.")
+        return
     client = st.selectbox("Select a client", options=clients,
                           format_func=lambda c: f"{c.name}  ({c.type})")
 
-    brief = brief_for(client.id)
+    brief = brief_builder.build_brief(client)
 
     st.markdown(
         f"**{client.name}** &nbsp;·&nbsp; {client.type} &nbsp;·&nbsp; {client.risk_appetite} risk  \n"
@@ -462,6 +565,12 @@ def render_pre_call_brief() -> None:
 # ===========================================================================
 # Router
 # ===========================================================================
+_require_login_gate()
+render_data_source()
+provider = _active_provider()
+matcher = MatchEngine(provider)
+brief_builder = BriefBuilder(provider)
+
 view = st.session_state.view
 inject_theme(view)
 if view == "axe":

@@ -56,33 +56,50 @@ pytest -q
 
 ## How it works
 
-### The adapter seam (the important design idea)
+### Data sources — synthetic *or* real (CSV / database / API)
 
-The engine and UI depend **only** on abstract interfaces in `data/providers.py`
-(`ClientProvider`, `AxeProvider`, `MarketProvider`). Today those are backed by
-`SyntheticProvider`, which manufactures a coherent fake world. To go live:
+The engine and UI depend **only** on the `DeskDataProvider` interface in `data/providers.py`.
+Anything that produces the same objects works unchanged. Three real-data providers ship in
+`data/loaders.py`, all selectable from the app's sidebar:
 
-```python
-# Today:
-provider = SyntheticProvider()
-# At a bank — write one class that reads real feeds, change one line:
-provider = CitiProvider()          # implements the same interfaces
-```
+| Source | Provider | How to use |
+|---|---|---|
+| Synthetic (demo) | `SyntheticProvider` | default — manufactured world, safe to share publicly |
+| Spreadsheets | `CsvProvider` | upload `instruments/clients/holdings/trades/axes[/overnight].csv` — templates in `sample_data/` |
+| Database | `SqlProvider` | point at a SQLite file (same query pattern → Postgres / MSSQL / Snowflake) |
+| Live API | `ApiProvider` | JSON at `/instruments`, `/clients`, `/holdings`, `/trades`, `/axes`, `/overnight` |
 
-Nothing in `engine/` or `app/` changes. No proprietary data is ever needed to build, test, or demo.
+All three funnel through one builder (`universe_from_rows`), so wiring a real bank feed only
+changes *how rows are fetched* — never the engine. For a bespoke source, write a class that builds
+a `Universe` and hand it to `UniverseProvider`; change nothing else.
+
+### Running it privately / inside a bank
+
+Real client, holdings, and trade data is confidential — so the app is built to run private:
+
+- **Password-gate the deployment.** Set `app_password` in Streamlit secrets and the real-data
+  modes require it; add `require_login = true` to lock the whole app behind a login. The public
+  synthetic demo stays open for sharing.
+- **Run it internally.** For live bank data it should run on the firm's own infrastructure
+  (internal server / private cloud), behind their SSO — never a public URL. It's a plain
+  Python/Streamlit app: `streamlit run app/streamlit_app.py` on an internal host, with
+  `SqlProvider`/`ApiProvider` pointed at internal systems.
 
 ### The match score (transparent by design)
 
-`match_score` (0–100) is a weighted blend of four components (`engine/scoring.py`):
+`match_score` (0–100) = a weighted blend of five factors × a hard **eligibility gate**
+(`engine/scoring.py`, `engine/match.py`):
 
-| Component | Weight | Question it answers |
+| Factor | Weight | Question it answers |
 |---|---|---|
-| Mandate fit | 0.35 | Is this even in-mandate (credit quality, duration, sector)? |
-| Holdings overlap | 0.30 | Do they already own this kind of risk? |
-| Behavioural history | 0.25 | Have they traded it with us, on the side we now need? |
-| Recency | 0.10 | Are they active in this sector right now? |
+| Mandate fit | 0.24 | Eligible & on-strategy (credit quality, duration band, sector)? |
+| Portfolio fit | 0.24 | Does it sit naturally in their book (issuer/sector, rating, tenor)? |
+| Directional fit | 0.22 | Right side for the desk? (a buyer with room vs. a holder who can trim) |
+| Flow history | 0.18 | Traded this sector with us, on the side we need, and how recently? |
+| Size fit | 0.12 | Can they absorb the ticket vs. their typical trade size? |
 
-Each component also returns a short reason, which is why every ranking comes with an explanation.
+The **eligibility gate** then multiplies the score down for hard no-gos (e.g. high-yield into an
+IG-only mandate ×0.10). Every factor returns a reason, so each ranking comes with an explanation.
 
 ### Project layout
 
@@ -90,15 +107,17 @@ Each component also returns a short reason, which is why every ranking comes wit
 data/
   universe.py     reference vocab (ratings, sectors, issuers, mandates)
   synthetic.py    seeded generator + the data model (Instrument/Client/Axe/...)
-  providers.py    the adapter interfaces + SyntheticProvider + InMemoryProvider
+  providers.py    interfaces + UniverseProvider + SyntheticProvider + InMemoryProvider
+  loaders.py      real-data providers: CSV / SQLite / REST API (+ sample-data writers)
 engine/
-  scoring.py      the four scoring components (pure, unit-tested)
+  scoring.py      five scoring factors + eligibility gate (pure, unit-tested)
   match.py        combines them -> ranked ClientMatch list + drafted pitch
   brief.py        builds the pre-call one-pager
 app/
-  streamlit_app.py   the split-screen UI
+  streamlit_app.py   split-screen UI + data-source picker + optional login
+sample_data/      CSV templates + a ready-to-use SQLite DB (demo the CSV/DB modes)
 cli.py            terminal view of the engine
-tests/            planted known-answer tests (we control the truth)
+tests/            planted known-answer tests + loader round-trip tests
 ```
 
 ## Testing on invented data — *better*, not worse
@@ -110,8 +129,9 @@ then assert the engine ranks them correctly. Real data can't do this — nobody 
 
 ## Deliberately out of scope (v1)
 
-Real market/bank data, authentication, live pricing, and asset classes beyond corporate bonds.
-These are exactly the "plug in later" items the adapter seam is designed for.
+Live market pricing, asset classes beyond corporate bonds, and production hardening (audit logging,
+SSO, deploy pipelines). Real-data connectors (CSV / database / API) and access control now ship —
+see above — but a full internal-bank deployment is its own effort.
 
 ---
 

@@ -1,0 +1,175 @@
+id,issuer,sector,rating,maturity_years,coupon,asset_class
+B0000,Forge Manufacturing,Industrials,AA-,26,5.01,Corporate Bond
+B0001,Meridian Health,Healthcare,AA+,16,3.82,Corporate Bond
+B0002,Beacon Software,Technology,A,26,5.37,Corporate Bond
+B0003,Sentinel Electric,Utilities,A-,13,4.79,Corporate Bond
+B0004,Northstar Biotic,Healthcare,AA+,29,4.65,Corporate Bond
+B0005,Alpine Care,Healthcare,A+,29,5.04,Corporate Bond
+B0006,Vantage Medical,Healthcare,BBB,30,6.36,Corporate Bond
+B0007,Redwood Machinery,Industrials,AA-,26,5.01,Corporate Bond
+B0008,Vertex Steel,Industrials,AA+,29,4.27,Corporate Bond
+B0009,Zenith Wireless,Telecom,A-,21,5.59,Corporate Bond
+B0010,Highgate Properties,Real Estate,A+,28,5.15,Corporate Bond
+B0011,Cascade Pharma,Healthcare,BBB-,26,6.44,Corporate Bond
+B0012,Cascade Pharma,Healthcare,BBB+,11,5.18,Corporate Bond
+B0013,Anchor Goods,Consumer,BBB+,19,5.3,Corporate Bond
+B0014,Northstar Biotic,Healthcare,A,10,4.35,Corporate Bond
+B0015,Keystone Bancorp,Financials,BBB+,2,4.93,Corporate Bond
+B0016,Pinnacle Gas,Energy,BBB+,1,4.94,Corporate Bond
+B0017,Ironwood Oil,Energy,BB,1,5.55,Corporate Bond
+B0018,Cardinal Energy,Energy,BB+,2,5.73,Corporate Bond
+B0019,Sentinel Electric,Utilities,BB-,3,6.41,Corporate Bond
+B0020,Meridian Health,Healthcare,BB-,3,5.98,Corporate Bond
+B0021,Cardinal Energy,Energy,BBB-,1,5.44,Corporate Bond
+B0022,Cornerstone REIT,Real Estate,BB-,3,6.35,Corporate Bond
+B0023,Keystone Bancorp,Financials,BBB+,2,4.91,Corporate Bond
+B0024,Highgate Properties,Real Estate,BB,4,6.02,Corporate Bond
+B0025,Sentinel Electric,Utilities,BB-,4,6.34,Corporate Bond
+B0026,Cobalt Chemicals,Materials,B+,1,6.51,Corporate Bond
+B0027,Cobalt Chemicals,Materials,BB-,4,6.25,Corporate Bond
+B0028,Vertex Steel,Industrials,BB,1,5.99,Corporate Bond
+B0029,Ironwood Oil,Energy,B-,2,7.11,Corporate Bond
+B0030,Titan Industrial,Industrials,BB,4,5.79,Corporate Bond
+B0031,Parkside Estates,Real Estate,A,20,4.96,Corporate Bond
+B0032,Clearline Comm,Telecom,A+,12,4.38,Corporate Bond
+B0033,Harvest Foods,Consumer,BBB-,25,6.09,Corporate Bond
+B0034,Orbital Compute,Technology,AA-,15,4.44,Corporate Bond
+B0035,Beacon Software,Technology,AA-,20,4.58,Corporate Bond
+B0036,Lumen Data,Technology,A,13,4.87,Corporate Bond
+B0037,Anchor Goods,Consumer,BBB,22,5.97,Corporate Bond
+B0038,Lumen Data,Technology,BBB-,24,6.18,Corporate Bond
+B0039,Anchor Goods,Consumer,A+,27,5.03,Corporate Bond
+B0040,Maple Retail,Consumer,BBB-,18,5.89,Corporate Bond
+B0041,Titan Industrial,Industrials,BBB,25,6.27,Corporate Bond
+B0042,Clearline Comm,Telecom,A-,20,5.55,Corporate Bond
+B0043,Titan Industrial,Industrials,BBB,11,5.56,Corporate Bond
+B0044,Sentinel Electric,Utilities,A-,29,5.6,Corporate Bond
+B0045,Zenith Wireless,Telecom,A,10,4.94,Corporate Bond
+B0046,Titan Industrial,Industrials,A+,13,4.52,Corporate Bond
+B0047,Clearline Comm,Telecom,BB,4,5.92,Corporate Bond
+B0048,Coastal Water,Utilities,BB-,1,5.84,Corporate Bond
+B0049,Summit Resources,Energy,BBB-,3,5.16,Corporate Bond
+B0050,Cardinal Energy,Energy,BB+,2,5.57,Corporate Bond
+B0051,Riverbend Utility,Utilities,BB,1,5.69,Corporate Bond
+B0052,Keystone Bancorp,Financials,B,2,6.31,Corporate Bond
+B0053,Helix Systems,Technology,BB+,4,5.66,Corporate Bond
+B0054,Union Lending,Financials,BB+,2,5.7,Corporate Bond
+B0055,Maple Retail,Consumer,B+,3,6.1,Corporate Bond
+B0056,Maple Retail,Consumer,B+,4,6.15,Corporate Bond
+B0057,Maple Retail,Consumer,BB-,1,6.1,Corporate Bond
+B0058,Keystone Bancorp,Financials,B+,1,6.01,Corporate Bond
+B0059,Willow Consumer,Consumer,B,3,6.89,Corporate Bond
+B0060,Cornerstone REIT,Real Estate,BBB+,13,5.12,Corporate Bond
+B0061,Granite Trust,Financials,BBB,22,5.6,Corporate Bond
+B0062,Summit REIT,Real Estate,A,27,5.59,Corporate Bond
+B0063,Keystone Bancorp,Financials,BBB-,23,6.02,Corporate Bond
+B0064,Harbor Financial,Financials,AA+,15,3.92,Corporate Bond
+B0065,Cornerstone REIT,Real Estate,A-,25,5.32,Corporate Bond
+B0066,Union Lending,Financials,A,17,5.15,Corporate Bond
+B0067,Orbital Compute,Technology,A+,22,4.82,Corporate Bond
+B0068,Atlas Components,Industrials,A-,10,4.93,Corporate Bond
+B0069,Union Lending,Financials,BBB-,14,5.68,Corporate Bond
+B0070,Union Lending,Financials,AA+,22,4.02,Corporate Bond
+B0071,Beacon Software,Technology,AA,29,4.92,Corporate Bond
+B0072,Beacon Software,Technology,AA,17,4.12,Corporate Bond
+B0073,Lumen Data,Technology,AAA,29,4.18,Corporate Bond
+B0074,Quanta Micro,Technology,A,26,5.52,Corporate Bond
+B0075,Anchor Goods,Consumer,BB-,2,5.94,Corporate Bond
+B0076,Granite Materials,Materials,BB-,2,6.13,Corporate Bond
+B0077,Granite Materials,Materials,BBB-,1,5.54,Corporate Bond
+B0078,Harvest Foods,Consumer,BBB-,1,5.1,Corporate Bond
+B0079,Willow Consumer,Consumer,BBB,3,5.19,Corporate Bond
+B0080,Crestview Brands,Consumer,BB,4,5.72,Corporate Bond
+B0081,Quarry Corp,Materials,BB-,4,5.88,Corporate Bond
+B0082,Quarry Corp,Materials,BB+,4,5.38,Corporate Bond
+B0083,Ridgeline Metals,Materials,BB,4,6.11,Corporate Bond
+B0084,Titan Industrial,Industrials,BB-,1,6.05,Corporate Bond
+B0085,Cornerstone REIT,Real Estate,BB+,4,5.36,Corporate Bond
+B0086,Coastal Water,Utilities,B-,2,6.99,Corporate Bond
+B0087,Riverbend Utility,Utilities,BB-,4,5.88,Corporate Bond
+B0088,Redwood Machinery,Industrials,B+,3,6.18,Corporate Bond
+B0089,Summit REIT,Real Estate,BB+,4,5.67,Corporate Bond
+B0090,Highgate Properties,Real Estate,BB,2,6.11,Corporate Bond
+B0091,Vertex Steel,Industrials,B,4,6.49,Corporate Bond
+B0092,Anchor Goods,Consumer,A-,27,5.74,Corporate Bond
+B0093,Evergreen Power,Utilities,BBB+,30,6.05,Corporate Bond
+B0094,Crestview Brands,Consumer,A,25,4.98,Corporate Bond
+B0095,Coastal Water,Utilities,BBB-,14,6.0,Corporate Bond
+B0096,Crestview Brands,Consumer,A,16,4.86,Corporate Bond
+B0097,Beacon Realty,Real Estate,A,25,5.52,Corporate Bond
+B0098,Delta Petroleum,Energy,AA+,10,3.7,Corporate Bond
+B0099,Delta Petroleum,Energy,AA,29,4.38,Corporate Bond
+B0100,Highgate Properties,Real Estate,AA+,12,3.9,Corporate Bond
+B0101,Beacon Realty,Real Estate,A-,25,5.43,Corporate Bond
+B0102,Cornerstone REIT,Real Estate,BBB,14,5.69,Corporate Bond
+B0103,Summit Resources,Energy,AA,19,4.47,Corporate Bond
+B0104,Cardinal Energy,Energy,A,14,4.65,Corporate Bond
+B0105,Zenith Wireless,Telecom,BBB,1,5.09,Corporate Bond
+B0106,Zenith Wireless,Telecom,BBB,2,4.92,Corporate Bond
+B0107,Keystone Bancorp,Financials,BBB,1,5.14,Corporate Bond
+B0108,Zenith Wireless,Telecom,BB+,3,5.43,Corporate Bond
+B0109,Granite Materials,Materials,BB+,2,5.79,Corporate Bond
+B0110,Signal Telecom,Telecom,BBB-,2,5.04,Corporate Bond
+B0111,Northstar Biotic,Healthcare,B-,1,6.83,Corporate Bond
+B0112,Northstar Biotic,Healthcare,B+,3,6.6,Corporate Bond
+B0113,Ridgeline Metals,Materials,B,1,6.4,Corporate Bond
+B0114,Vantage Medical,Healthcare,B,3,6.63,Corporate Bond
+B0115,Meridian Health,Healthcare,B+,4,6.62,Corporate Bond
+B0116,Ridgeline Metals,Materials,BB-,1,5.92,Corporate Bond
+B0117,Alpine Care,Healthcare,B+,4,6.14,Corporate Bond
+B0118,Northstar Biotic,Healthcare,B-,3,6.64,Corporate Bond
+B0119,Quarry Corp,Materials,BB-,1,6.13,Corporate Bond
+B0120,Cobalt Chemicals,Materials,A,15,4.61,Corporate Bond
+B0121,Highgate Properties,Real Estate,AA,17,4.11,Corporate Bond
+B0122,Vertex Steel,Industrials,A+,28,4.93,Corporate Bond
+B0123,Delta Petroleum,Energy,BBB-,28,6.25,Corporate Bond
+B0124,Evergreen Power,Utilities,AAA,12,3.71,Corporate Bond
+B0125,Meridian Health,Healthcare,AA+,16,3.83,Corporate Bond
+B0126,Maple Retail,Consumer,A,18,4.77,Corporate Bond
+B0127,Northstar Biotic,Healthcare,AAA,19,4.02,Corporate Bond
+B0128,Northstar Biotic,Healthcare,AAA,24,4.2,Corporate Bond
+B0129,Meridian Health,Healthcare,A+,22,5.09,Corporate Bond
+B0130,Sentinel Electric,Utilities,AA,10,3.62,Corporate Bond
+B0131,Evergreen Power,Utilities,AAA,12,3.65,Corporate Bond
+B0132,Beacon Software,Technology,BB+,4,5.68,Corporate Bond
+B0133,Meridian Fiber,Telecom,BB,4,5.68,Corporate Bond
+B0134,Summit Resources,Energy,BBB+,2,4.56,Corporate Bond
+B0135,Sterling Capital,Financials,BB+,1,5.32,Corporate Bond
+B0136,Parkside Estates,Real Estate,BB,1,5.86,Corporate Bond
+B0137,Meadow Grid,Utilities,B-,2,6.55,Corporate Bond
+B0138,Riverbend Utility,Utilities,B-,2,7.02,Corporate Bond
+B0139,Meadow Grid,Utilities,BB,1,5.51,Corporate Bond
+B0140,Highgate Properties,Real Estate,B-,3,6.88,Corporate Bond
+B0141,Riverbend Utility,Utilities,B-,1,6.7,Corporate Bond
+B0142,Coastal Water,Utilities,BB+,2,5.55,Corporate Bond
+B0143,Willow Consumer,Consumer,AA,18,4.13,Corporate Bond
+B0144,Sterling Capital,Financials,BBB-,15,6.07,Corporate Bond
+B0145,Alpine Care,Healthcare,AAA,29,4.24,Corporate Bond
+B0146,Keystone Bancorp,Financials,A-,10,4.75,Corporate Bond
+B0147,Cornerstone REIT,Real Estate,BBB+,14,5.56,Corporate Bond
+B0148,Sentinel Electric,Utilities,AA,29,4.89,Corporate Bond
+B0149,Vantage Medical,Healthcare,BBB+,17,5.35,Corporate Bond
+B0150,Meadow Grid,Utilities,BBB-,16,5.75,Corporate Bond
+B0151,Meridian Health,Healthcare,BBB,29,6.15,Corporate Bond
+B0152,Meridian Health,Healthcare,AAA,12,3.64,Corporate Bond
+B0153,Crestview Brands,Consumer,A+,28,4.83,Corporate Bond
+B0154,Meridian Health,Healthcare,A-,19,5.08,Corporate Bond
+B0155,Cascade Pharma,Healthcare,AAA,15,3.6,Corporate Bond
+B0156,Northstar Biotic,Healthcare,AA+,26,4.07,Corporate Bond
+B0157,Lumen Data,Technology,BBB-,30,6.72,Corporate Bond
+B0158,Vantage Medical,Healthcare,BBB+,15,5.31,Corporate Bond
+B0159,Union Lending,Financials,A+,30,5.18,Corporate Bond
+B0160,Anchor Goods,Consumer,BBB,12,5.25,Corporate Bond
+B0161,Quanta Micro,Technology,BB-,3,6.05,Corporate Bond
+B0162,Titan Industrial,Industrials,BBB+,4,5.12,Corporate Bond
+B0163,Vertex Steel,Industrials,BB+,2,5.63,Corporate Bond
+B0164,Northstar Biotic,Healthcare,BB-,3,5.83,Corporate Bond
+B0165,Vertex Steel,Industrials,BB,2,5.62,Corporate Bond
+B0166,Quanta Micro,Technology,BBB-,2,5.51,Corporate Bond
+B0167,Quanta Micro,Technology,BB-,2,5.98,Corporate Bond
+B0168,Nova Networks,Telecom,B,3,6.91,Corporate Bond
+B0169,Signal Telecom,Telecom,B-,1,6.54,Corporate Bond
+B0170,Meridian Fiber,Telecom,BB+,2,5.51,Corporate Bond
+B0171,Nova Networks,Telecom,BB,4,5.88,Corporate Bond
+B0172,Clearline Comm,Telecom,B+,1,6.43,Corporate Bond
+B0173,Signal Telecom,Telecom,BB-,2,6.08,Corporate Bond
