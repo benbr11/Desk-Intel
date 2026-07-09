@@ -467,7 +467,14 @@ def render_axe_matcher() -> None:
         f"{inst.sector} &nbsp;·&nbsp; {inst.rating} &nbsp;·&nbsp; {inst.maturity_years}y "
         f"&nbsp;·&nbsp; urgency **{axe.urgency}**")
 
-    ranked = matcher.rank_clients_for(axe)
+    with st.popover("⚖️  Weights"):
+        st.caption("Tune how much each factor counts — auto-normalized to 100%.")
+        raw_w = {k: st.slider(_FACTOR_DESC[k][0], 0, 100, int(round(WEIGHTS[k] * 100)),
+                              key=f"w_{k}") for k in _FACTOR_ORDER}
+    total_w = sum(raw_w.values()) or 1
+    weights = {k: v / total_w for k, v in raw_w.items()}
+
+    ranked = MatchEngine(provider, weights=weights).rank_clients_for(axe)
     if not ranked:
         st.info("No clients in the current data source.")
         return

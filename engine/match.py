@@ -38,10 +38,10 @@ class ClientMatch:
 
 
 def _explain(components: dict[str, tuple[float, str]],
-             eligibility: tuple[float, str]) -> str:
+             eligibility: tuple[float, str], weights: dict[str, float] = WEIGHTS) -> str:
     """Top few contributing factors, plus an eligibility caveat if one applies."""
     ranked = sorted(components.items(),
-                    key=lambda kv: kv[1][0] * WEIGHTS[kv[0]], reverse=True)
+                    key=lambda kv: kv[1][0] * weights[kv[0]], reverse=True)
     parts = [detail for _, (raw, detail) in ranked if raw > 0 and detail][:3]
     mult, note = eligibility
     if mult < 0.85 and note:
@@ -63,8 +63,9 @@ def _draft_pitch(client: Client, axe: Axe, lead_reason: str) -> str:
 
 
 class MatchEngine:
-    def __init__(self, provider: ClientProvider):
+    def __init__(self, provider: ClientProvider, weights: dict[str, float] | None = None):
         self.provider = provider
+        self.weights = weights or WEIGHTS
 
     def score_client(self, client: Client, axe: Axe) -> ClientMatch:
         instr = axe.instrument
@@ -76,9 +77,9 @@ class MatchEngine:
             "size": scoring.size_fit(client, axe),
         }
         elig = scoring.eligibility(client, instr)
-        base = sum(WEIGHTS[name] * raw for name, (raw, _) in components.items())
+        base = sum(self.weights[name] * raw for name, (raw, _) in components.items())
         score = round(100 * base * elig[0], 1)
-        explanation = _explain(components, elig)
+        explanation = _explain(components, elig, self.weights)
         lead_reason = explanation.split(";")[0].strip().lstrip("⚠ ").strip()
         pitch = _draft_pitch(client, axe, lead_reason)
         return ClientMatch(client, score, components, elig, explanation, pitch)
