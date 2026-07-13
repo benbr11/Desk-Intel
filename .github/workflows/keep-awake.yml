@@ -13,5 +13,10 @@ jobs:
     steps:
       - name: Ping the app
         run: |
-          curl -sSL --max-time 90 "https://axurry.streamlit.app/" -o /dev/null \
-            && echo "pinged axurry.streamlit.app"
+          # Hit the health endpoint (no redirects) so Streamlit registers traffic.
+          # Never fail the job — this is a best-effort keep-alive.
+          code=$(curl -s -m 60 -o /dev/null -w "%{http_code}" \
+            "https://axurry.streamlit.app/_stcore/health" || echo "000")
+          echo "health endpoint returned HTTP $code"
+          curl -s -m 60 -o /dev/null "https://axurry.streamlit.app/" || true
+          exit 0
